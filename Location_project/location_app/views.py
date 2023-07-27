@@ -81,14 +81,12 @@ def index_view(request):
             }
             location_list.append(data)
 
-        print("\n\n\n value 1", values, "\n\n\n")
 
         data = {"location_list": location_list if request.user.is_authenticated else []}
 
     else:
         data = {}
 
-    print("\n\n\n data ", data, "\n\n\n")
     return render(request, "location.html", data)
 
 
@@ -97,12 +95,10 @@ def add_location_data(request):
 
     if request.method == "POST":
 
-        print("\n\n\n request ", request, "\n\n\n\n")
         place_name = request.POST["name"]
         description = request.POST["description"]
         lat = request.POST["lat"]
         long = request.POST["long"]
-        print(place_name, description, lat, long)
         if not place_name or not description:
             return HttpResponse("Please fill the Name and description")
 
@@ -126,7 +122,6 @@ def sign_in_view(request):
         username = request.POST["username"]
         password = request.POST["password"]
         user = auth.authenticate(username=username, password=password)
-        print("\n\n\n\n user ", user, "  ", username, password, "\n\n\n\n")
         if user:
 
             auth.login(request, user)
@@ -157,7 +152,6 @@ def search_data(request):
     found_data = []
 
     if request.method == "POST":
-        print("\n\n\n\n request.uer ", request.user, "\n\n\n\n")
         values = PlacesModel.objects.filter(user_name=request.user)
         search_data = request.POST["search_data"]
         for data in values:
@@ -180,5 +174,4 @@ def search_data(request):
                 )
 
     data = {"location_list": found_data}
-    print("\n\n\n\n data ", data, "\n\n\n\n")
     return render(request, "location.html", data)

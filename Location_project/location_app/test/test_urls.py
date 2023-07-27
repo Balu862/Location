@@ -14,5 +14,5 @@ from location_app.views import (
 class TestUrls(SimpleTestCase):
     def test_list_url_is_resolved(self):
         url = reverse("sign_in")
-        print(resolve(url))
+        
         self.assertEquals(resolve(url).func, sign_in_view)

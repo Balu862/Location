@@ -54,15 +54,6 @@ class SignInTestCase(TestCase):
         # Check if the response is a message to use the sign-in form
         self.assertEqual(response.status_code, 200)
 
-    # def test_search(self):
-    #     # Create a client to simulate HTTP requests
-    #     client = Client()
-
-    #     # Perform a POST request to sign in with invalid credentials
-    #     response = client.post('/search/', {'user': 7, 'search_data': 'A'})
-    #     print("\n\n\n response SEARCH",response," \n\n\n\n" )
-    #     # Check if the response indicates invalid credentials
-    #     self.assertEqual(response.status_code, 302)
 
     def test_search_data_found(self):
         # Test if the search_data function returns data for a valid search term
