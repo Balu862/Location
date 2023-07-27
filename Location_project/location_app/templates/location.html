@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+{% block content %}
+<style>
+    * {
+      box-sizing: border-box;
+    }
+    
+    /* Create three equal columns that floats next to each other */
+    .column {
+      float: left;
+      width: 30.33%;
+      padding: 10px;
+      height: 300px; /* Should be removed. Only for demonstration */
+    }
+    
+    /* Clear floats after the columns */
+    .row:after {
+      content: "";
+      display: table;
+      clear: both;
+    }
+    #map {
+        flex: 1; /* Map takes the remaining space */
+        height: 100%; /* Adjust the height as needed */
+    }
+
+    #containerOnRight {
+        /* Add styling for the container on the right */
+        /* You can set width, background, padding, etc. */
+        width: 300px; /* Adjust the width as needed */
+        background-color: #f0f0f0;
+        padding: 10px;
+    }
+    </style>
+<body>
+    
+<div class="row" style="--bs-columns: 3"> 
+    
+<div class="column" >
+    {% if location_list %}
+    
+    <h4>   &nbsp;&nbsp;Your Locations</h4>
+    <div class="container" >
+        <form method="post" action="{% url 'search' %}">
+            {% csrf_token %}
+            
+            <input type="text" name="search_data" class="form-control" placeholder = "Please Enter the store name or description" size="25"/>
+            <br>
+            
+            <td><input type="submit" class= "btn btn-primary" value="search"></td>
+        </form>
+    </div>
+    <br>
+    <br>
+    {% for data in location_list %}
+    
+    <form method="post" action="{% url 'delete_data' data.id %}">
+        {% csrf_token %}
+    <table class="table table-borderless">
+        
+        <tbody>
+          <tr>  
+            <td>{{data.place_name}}</td>
+            <td>{{data.description}}</td>
+            <td><input type="submit" value="Delete" class= "btn btn-danger"></td>
+            {% if data.show_flag %}
+            <td><input type="submit" value="Show All" class= "btn btn-primary" formaction="{% url 'index' %}"></td>
+            {% endif %}
+          </tr>
+        </tbody>
+      </table>
+    </form>
+    {% endfor %}
+    
+    {% else %}
+    
+    <h4>Please Select the map to save your Selection</h4>
+    {% endif %}
+
+</div>
+<div id="map" style="height: 600px; width: 400px;"> </div>
+
+<div class="container" id="containerOnRight">
+<form method="POST" action="{% url 'add_location_data' %}" >
+    {% csrf_token %}
+    <label id="lname">Location Name</label>
+   <input type="text" id="name" name="name" class="form-control" size="20" required/>
+   <label id="ldescription">Location description</label>
+   <input type="text" id="description" class="form-control" size="20" name="description" required/>
+    <input type="text" id="lat" hidden name="lat"/>
+    <input type="text" id="long" name="long" hidden/>
+    <br>
+   <input type="submit" id="add" class="btn btn-success" value="Add location"/>
+</form>
+</div>
+
+</div>
+<div>
+    {% if location_list %}
+        {{location_list|json_script:"location_json"}}
+   {% endif %}
+</div>
+   <script>
+    document.getElementById("name").style.visibility = "hidden";
+    document.getElementById("description").style.visibility = "hidden";
+    document.getElementById("lname").style.visibility = "hidden";
+    document.getElementById("ldescription").style.visibility = "hidden";
+    document.getElementById("add").style.visibility = "hidden";
+   
+    var map = L.map('map').setView([12.97, 77.5946], 13);
+
+    
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '© OpenStreetMap'
+    }).addTo(map);
+   
+  
+    let location_json = document.getElementById("location_json")
+    if (location_json){
+        let locations  = JSON.parse(location_json.textContent)
+        if (locations.length>0)
+        {   
+            console.log("locations",locations)
+            locations.forEach(each_location => {L.marker([each_location.latitude,each_location.longitude]).addTo(map);
+            });
+        }
+    }
+    var markers = [];
+    map.on("click", (event) => {
+        document.getElementById("name").style.visibility = "visible";
+        document.getElementById("description").style.visibility = "visible";
+        document.getElementById("lname").style.visibility = "visible";
+        document.getElementById("ldescription").style.visibility = "visible";
+        document.getElementById("add").style.visibility = "visible";
+        document.getElementById("name").value="";
+        document.getElementById("lat").value=event.latlng.lat;
+        document.getElementById("long").value=event.latlng.lng;
+        
+        if (markers.length>0)
+        {
+            console.log("marker ", marker_1)
+            marker_1.remove();
+            markers = []
+        }
+        marker_1 = L.marker([event.latlng.lat, event.latlng.lng]).addTo(map);
+        markers.push(marker_1);
+    })
+
+   
+    </script>
+    
+{% endblock %}
